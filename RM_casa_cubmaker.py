@@ -60,11 +60,11 @@ for f in range(nfreq):	# For each frequency, make a cube of the Q and U maps
 	tstring = stem+'Q'+str(f+1)+ending + ' ' +stem+'U'+str(f+1)+ending
 	ostring = stem+str(f)+'.qu.cube.image'
 	freq_cube_string = freq_cube_string + ostring+' '
-	cube = ia.imageconcat(outfile= ostring, infiles=tstring,axis=stokes_axis_number)	# make cube using the Stokes axis
+	cube = ia.imageconcat(outfile= ostring, infiles=tstring,axis=stokes_axis_number) # make cube using the Stokes axis
 	cube.done()
 ostring = stem +'.preRMcube.image'
 
-cube = ia.imageconcat(outfile= ostring, infiles=freq_cube_string,axis=freq_axis_number, relax=T)	# now make another cube using the frequency axis - remember to relax other conditions
+cube = ia.imageconcat(outfile= ostring, infiles=freq_cube_string,axis=freq_axis_number, relax=T) # now make another cube using the frequency axis - remember to relax other conditions
 cube.done()
 	#rmfit(imagename=ostring, rm=rmstem+str(i+1)+'.rm.image', rmerr=rmstem+str(i+1)+'.rmerr.image', pa0=rmstem+str(i+1)+'.pa0.image', pa0err=rmstem+str(i+1)+'.pa0err.image')
 os.system('rm -rf '+stem+'*.qu.cube*')#removes intermediary cubes
