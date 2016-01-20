@@ -64,8 +64,8 @@ for f in range(nfreq):
 	calc_tot_noise(istring,ustring,stem+'U'+str(f+1)+'_noise.image',Nant,Nif[f],Nsc,Noisebox)
 
 #writes as FITS for AIPS use
-	exportfits(stem+'Q'+str(f+1)+'_noise.image',stem+'Q'+str(f)+'_noise.FITS')
-	exportfits(stem+'U'+str(f+1)+'_noise.image',stem+'U'+str(f)+'_noise.FITS')
+	exportfits(stem+'Q'+str(f+1)+'_noise.image',stem+'Q'+str(f+1)+'_noise.FITS')
+	exportfits(stem+'U'+str(f+1)+'_noise.image',stem+'U'+str(f+1)+'_noise.FITS')
 
 
 
