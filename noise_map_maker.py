@@ -13,20 +13,20 @@ def calc_tot_noise(ICL_filename = "",QorU_filename="",noise_outfile="",Nant='',N
 	Imax_term = 0.09*(Imax*Imax)
 	
 	
-	boxstat = imstat(imagename=QorU_filename,box = str(Noise_box[0])+','+str(Noise_box[1])+','+str(Noise_box[2])+','+str(Noise_box[3]))
+	boxstat = imstat(imagename=QorU_filename,box = str(Noise_box[0])+','+str(Noise_box[1])+ \
+	','+str(Noise_box[2])+','+str(Noise_box[3])) #image statistics for noise box
 	
-	rms_noise = boxstat['rms'][0]
-	rms_val = 3.25*rms_noise*rms_noise
+	rms_noise = boxstat['rms'][0] #retrieves rms 
+	rms_val = 3.25*rms_noise*rms_noise #gets (1.8*rms)^2
 
 
-	formula = 'sqrt( '+str(rms_val)+' + '+str(dval)+'*(IM0*IM0 + '+str(Imax_term)+') )'
-	immath(imagename=ICL_filename,mode= 'evalexpr',expr=formula,outfile=noise_outfile)
+	formula = 'sqrt( '+str(rms_val)+' + '+str(dval)+'*(IM0*IM0 + '+str(Imax_term)+') )'#equation for immath
+	immath(imagename=ICL_filename,mode= 'evalexpr',expr=formula,outfile=noise_outfile) #immath call
 	
 	return()
 
 #Noisebox = [blcx, blcy, trcx, trcy]
 #calc_tot_noise('0923_int_I1.CLEAN.image', '0923_int_Q1.CLEAN.image', '0923_Q1_noise_test.im', 10, 1,8, [27,21,235,83] )
-
 
 print 'This script will make accurate noise maps for CASA files \n\n'
 #inputs
@@ -58,11 +58,12 @@ for f in range(nfreq):
 
 	istring = stem+'I'+str(f+1)+ending
 	qstring = stem+'Q'+str(f+1)+ending
-	ustring = stem+'U'+str(f+1)+ending
+	ustring = stem+'U'+str(f+1)+ending #filenames
 
 	calc_tot_noise(istring,qstring,stem+'Q'+str(f+1)+'_noise.image',Nant,Nif[f],Nsc,Noisebox)
 	calc_tot_noise(istring,ustring,stem+'U'+str(f+1)+'_noise.image',Nant,Nif[f],Nsc,Noisebox)
 
+#writes as FITS for AIPS use
 	exportfits(stem+'Q'+str(f+1)+'_noise.image',stem+'Q'+str(f)+'_noise.FITS')
 	exportfits(stem+'U'+str(f+1)+'_noise.image',stem+'U'+str(f)+'_noise.FITS')
 
