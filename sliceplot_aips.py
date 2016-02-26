@@ -46,7 +46,7 @@ plt.plot(dmas, RM, 'k-', linewidth = 3) #plots slice
 plt.fill_between(dmas, RM-RMerr, RM+RMerr, facecolor ='gray') #plots error bars
 #the following changes font sizes for the labels
 plt.xlabel('Transverse Slice (mas)', fontsize=20)
-plt.xlim(xmin=-0.1)
+plt.xlim(xmin=0.0, xmax=max(dmas))
 plt.xticks(fontsize = 16)
 plt.yticks(fontsize = 16)
 plt.ylabel('Rotation Measure (rad m$^{-2}$)',fontsize=20)
