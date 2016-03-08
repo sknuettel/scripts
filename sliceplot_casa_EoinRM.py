@@ -76,7 +76,7 @@ plt.plot(D_vals, RM_vals, 'k-', linewidth = 3) #plots slice
 plt.fill_between(D_vals, RM_vals-RM_err_vals, RM_vals+RM_err_vals, facecolor ='gray') #plots error bars
 #the following changes font sizes for the labels
 plt.xlabel('Transverse Slice (arcsec)', fontsize=20)
-plt.xlim(xmin=-cellsize,xmax=RM_vals[-1]+cellsize)
+plt.xlim(xmin=-cellsize,xmax=D_vals[-1]+cellsize)
 plt.xticks(fontsize = 16)
 plt.yticks(fontsize = 16)
 plt.ylabel('Rotation Measure (rad m$^{-2}$)',fontsize=20)
