@@ -10,17 +10,17 @@ import os
 ##########################################################################################
 
 
-visname = 'Coma_A_vis.ms' #put the name for uncalibrated visibility ms here
+visname = 'Coma_A_Sband-hanning.ms' #put the name for uncalibrated visibility ms here
 
-splitname = 'Coma_A_vis_split.ms'#name for desired calibrated split data of source
+splitname = 'Coma_A_vis_split_script.ms'#name for desired calibrated split data of source
 
 table_nam = 'Coma_A_vis_script' #name stem for the calibration tables applied and plots made
 
-antref = 'ea20' #central reference antenna
+antref = 'ea10' #central reference antenna
 
 bpcal = '3C 286' #bandpass calibrator
 
-phascal = '3C 286' #name of phase calibrator
+phascal = '3C286P' #name of phase calibrator
 
 fluxcal = '3C 286' #name of flux calibrator
 model_nam = '3C286_S.im' #model file to use
@@ -84,7 +84,7 @@ calmode='p',solint='int', minsnr=5.0, gaintable=[table_nam+'.antpos'])
 #uses central channels for high snr
 
 if doplot:
-	plotcal(caltable=table_nam'.G0all',xaxis='time',yaxis='phase',
+	plotcal(caltable=table_nam+'.G0all',xaxis='time',yaxis='phase',
         poln='R',iteration='antenna',plotrange=[-1,-1,-180,180])
 
 
@@ -165,7 +165,7 @@ gaincal(vis=visname,caltable=table_nam+'.G1', field = fluxcal, spw= spw_noedges,
 
 #for phase calibrator	
 gaincal(vis=visname,caltable=table_nam+'.G1', field = phascal, spw= spw_noedges,
-	solint ='inf',refant='ea20', gaintype = 'G', calmode = 'ap',
+	solint ='inf',refant=antref, gaintype = 'G', calmode = 'ap',
 	gaintable=[table_nam+'.antpos',
         table_nam+'.K0',
         table_nam+'.B0'],
@@ -184,8 +184,10 @@ gaincal(vis=visname,caltable=table_nam+'.G1', field = phascal, spw= spw_noedges,
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #have to find way to read Ipb[] and freq[] from the visibility or using setjy 
 
+#(ms.getspectralwindowinfo might have the function i seek)
 
-#calculated perley butler I fluxes for above freqs
+
+#calculated perley butler I fluxes for above freqs (can get this from setjy)
 Ipb=[12.581,12.15,11.754,11.387,11.046,10.729,10.432,10.154,9.9412,9.6929,9.4588,9.2376,9.0282,8.8297,8.6411,8.4617]
 
 #freqs from beginning of every spw
@@ -205,7 +207,7 @@ for i in range(0,16):
 	
 	
 	#if at last spw we use the previous alpha	
-	setjy(vis=sbandvis,field=fluxcal, standard= 'manual', spw=str(j+16),
+	setjy(vis=visname,field=fluxcal, standard= 'manual', spw=str(j+16),
 		fluxdensity=[Ipb[j],0,0,0],spix=[alpha,0],reffreq=freqstr,selectdata=T
 		,polindex=[Fpol,0],polangle=[d0,0], scalebychan=T,usescratch=F)
 
@@ -216,7 +218,7 @@ os.system('rm -rf '+table_nam+'.Kcross') #removes all old tables
 #solving for cross hand delays
 gaincal(vis=visname, caltable =table_nam+'.Kcross',
 	field = fluxcal, spw=spw_noedges,gaintype='KCROSS',
-	solint='inf',combine='scan',refant='ea20',
+	solint='inf',combine='scan',refant=antref,
 	gaintable=[table_nam+'.antpos',
 		table_nam+'.K0',
 		table_nam+'.B0',
@@ -224,19 +226,21 @@ gaincal(vis=visname, caltable =table_nam+'.Kcross',
 	gainfield=['','','',fluxcal],
 	parang=T)
 
+if doplot:
+	plotcal(caltable=table_nam+'.Kcross', yaxis='delay', xaxis='antenna',iteration='spw')
 
 os.system('rm -rf '+table_nam+'.D1') #removes all old tables 
 #Solving for the Leakage Terms
 polcal(vis=visname, caltable=table_nam+'.D1',
-	field=phascal, spw=spw_select,refant=antref, poltype='Df', solint='inf',combine='scan',
+	field=phascal, spw=spw_select,refant=antref, poltype='Df+QU', solint='inf',combine='scan',
 	gaintable=[table_nam+'.antpos',
 		table_nam+'.K0',
 		table_nam+'.B0',
 		table_nam+'.G1',
 		table_nam+'.Kcross'],
-	gainfield=['','','',fluxcal,''])
+	gainfield=['','','',phascal,''])
 
-#note that full width of spw’s was used as we have a bandpass table to apply
+#note that full width of spw's was used as we have a bandpass table to apply
 
 
 os.system('rm -rf '+table_nam+'.X1') #removes all old tables 
@@ -260,7 +264,7 @@ polcal(vis=visname, caltable=table_nam+'.X1',
 ##########################################################################################
 
 #apply calibration to calibrators
-applycal(vis=sbandvis,field=fluxcal,
+applycal(vis=visname,field=fluxcal,
 	gaintable=[table_nam+'.antpos',
 		table_nam+'.G1',
 		table_nam+'.K0',
@@ -273,7 +277,7 @@ applycal(vis=sbandvis,field=fluxcal,
 	calwt=[False],
 	parang=True)
 
-applycal(vis=sbandvis,field=phascal,
+applycal(vis=visname,field=phascal,
 	gaintable=[table_nam+'.antpos',
 		table_nam+'.G1',
 		table_nam+'.K0',
@@ -289,7 +293,7 @@ applycal(vis=sbandvis,field=phascal,
 
 
 #apply calibration to source
-applycal(vis=sbandvis,field=source,
+applycal(vis=visname,field=source,
 	gaintable=[table_nam+'.antpos',
 		table_nam+'.G1',
 		table_nam+'.K0',
@@ -298,7 +302,7 @@ applycal(vis=sbandvis,field=source,
 		table_nam+'.D1',
 		table_nam+'.X1'],
 	gainfield=['',phascal,'','','','',''],
-	interp=['',linear,'','','','',''],
+	interp=['','linear','','','','',''],
 	calwt=[False],
 	parang=True)
 	
